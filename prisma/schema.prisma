@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String   @unique
+  email       String   @unique
+  name        String
+  phone       String
+  role        String   @default("student")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  requests Request[]
+  votes    Vote[]
+}
+
+model Driver {
+  id          String   @id @default(uuid())
+  name        String
+  carType     String
+  carNumber   String
+  phone       String
+  avgPricing  Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Request {
+  id          String   @id @default(uuid())
+  userId      String
+  from        String
+  to          String
+  date        DateTime
+  time        String
+  carType     String?
+  maxPersons  Int
+  currentOccupancy Int @default(0)
+  status      String   @default("active") // active, completed, cancelled, expired
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User @relation(fields: [userId], references: [id])
+  votes Vote[]
+
+  @@index([from, to, date])
+  @@index([status])
+}
+
+model Vote {
+  id          String   @id @default(uuid())
+  requestId   String
+  userId      String
+  status      String   @default("pending") // pending, accepted, rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([requestId, userId]) // Prevent duplicate votes from same user
+}
