@@ -14,6 +14,9 @@ class UserController {
           email: true,
           name: true,
           phone: true,
+          year: true,
+          course: true,
+          gender: true,
           role: true,
           createdAt: true,
           updatedAt: true
@@ -40,13 +43,32 @@ class UserController {
   async updateProfile(req, res, next) {
     try {
       const userId = req.user.id;
-      const { name, phone } = req.body;
+      const { name, phone, year, course, gender } = req.body;
+
+      // Validate year if provided
+      if (year !== undefined && (typeof year !== 'number' || year < 1 || year > 10)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Year must be a number between 1 and 10'
+        });
+      }
+
+      // Validate gender if provided
+      if (gender !== undefined && !['male', 'female', 'other'].includes(gender.toLowerCase())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Gender must be male, female, or other'
+        });
+      }
 
       const updatedUser = await prisma.user.update({
         where: { id: userId },
         data: {
           ...(name && { name }),
-          ...(phone && { phone })
+          ...(phone && { phone }),
+          ...(year !== undefined && { year }),
+          ...(course && { course }),
+          ...(gender && { gender: gender.toLowerCase() })
         },
         select: {
           id: true,
@@ -54,6 +76,9 @@ class UserController {
           email: true,
           name: true,
           phone: true,
+          year: true,
+          course: true,
+          gender: true,
           role: true,
           createdAt: true,
           updatedAt: true
@@ -147,6 +172,55 @@ class UserController {
       res.json({
         success: true,
         message: 'Account deleted successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Filter users by criteria (admin only)
+  async filterUsers(req, res, next) {
+    try {
+      const cleanupService = require('../services/cleanupService');
+      const filters = req.query;
+      
+      const result = await cleanupService.filterUsers(filters);
+      
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get user statistics (admin only)
+  async getUserStatistics(req, res, next) {
+    try {
+      const cleanupService = require('../services/cleanupService');
+      
+      const stats = await cleanupService.getUserStatistics();
+      
+      res.json({
+        success: true,
+        data: stats
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get incomplete user profiles (admin only)
+  async getIncompleteProfiles(req, res, next) {
+    try {
+      const cleanupService = require('../services/cleanupService');
+      
+      const incompleteProfiles = await cleanupService.cleanupIncompleteUserProfiles();
+      
+      res.json({
+        success: true,
+        data: incompleteProfiles
       });
     } catch (error) {
       next(error);

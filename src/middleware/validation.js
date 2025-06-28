@@ -103,12 +103,61 @@ const updateUserValidation = [
     .optional()
     .trim()
     .matches(/^\+?[\d\s\-\(\)]{10,15}$/)
-    .withMessage('Phone number must be valid')
+    .withMessage('Phone number must be valid'),
+  
+  body('year')
+    .optional()
+    .isInt({ min: 1, max: 10 })
+    .withMessage('Year must be a number between 1 and 10'),
+  
+  body('course')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Course must be between 2 and 100 characters'),
+  
+  body('gender')
+    .optional()
+    .trim()
+    .toLowerCase()
+    .isIn(['male', 'female', 'other'])
+    .withMessage('Gender must be male, female, or other')
+];
+
+const userFilterValidation = [
+  query('year')
+    .optional()
+    .isInt({ min: 1, max: 10 })
+    .withMessage('Year must be a number between 1 and 10'),
+  
+  query('course')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Course must be between 1 and 100 characters'),
+  
+  query('gender')
+    .optional()
+    .trim()
+    .toLowerCase()
+    .isIn(['male', 'female', 'other'])
+    .withMessage('Gender must be male, female, or other'),
+  
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be between 1 and 100'),
+  
+  query('offset')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Offset must be a non-negative integer')
 ];
 
 module.exports = {
   createRequestValidation,
   searchRequestsValidation,
   voteValidation,
-  updateUserValidation
+  updateUserValidation,
+  userFilterValidation
 };

@@ -22,11 +22,11 @@ router.use('/votes', voteRoutes);
 router.use('/users', userRoutes);
 
 // 404 handler for API routes
-router.use('*', (req, res) => {
+router.use((req, res) => {  // Removed '*' to handle all unmatched API routes
   res.status(404).json({
     success: false,
     message: 'API endpoint not found'
   });
 });
 
-module.exports = router;
+module.exports=router;
