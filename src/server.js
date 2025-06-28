@@ -187,30 +187,30 @@ class RideShareServer {
       
       // Start the server
       this.server = this.app.listen(this.port, () => {
-        console.log(`🚀 Rideshare server running on port ${this.port}`);
-        console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`🔗 API Base URL: http://localhost:${this.port}${this.apiBasePath}`);
+        console.log(`Rideshare server running on port ${this.port}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`API Base URL: http://localhost:${this.port}${this.apiBasePath}`);
         
         if (process.env.NODE_ENV === 'development') {
-          console.log(`🛠️ Developer tools:`);
-          console.log(`   - GET /admin/cleanup - Run manual cleanup`);
-          console.log(`   - GET /admin/stats - View system statistics`);
+          console.log(`Developer tools:`);
+          console.log(`GET /admin/cleanup - Run manual cleanup`);
+          console.log(`GET /admin/stats - View system statistics`);
         }
       });
       
     } catch (error) {
-      console.error('🔥 Failed to start server:', error);
+      console.error('Failed to start server:', error);
       process.exit(1);
     }
   }
 
   async shutdownGracefully() {
-    console.log('\n🛑 Shutting down server gracefully...');
+    console.log('\nShutting down server gracefully...');
     
     // Close HTTP server
     if (this.server) {
       this.server.close(() => {
-        console.log('🌐 HTTP server closed');
+        console.log('HTTP server closed');
       });
     }
     
@@ -220,7 +220,7 @@ class RideShareServer {
     // Close database connections
     const prisma = require('./config/database');
     await prisma.$disconnect();
-    console.log('💾 Database connection closed');
+    console.log('Database connection closed');
     
     process.exit(0);
   }
