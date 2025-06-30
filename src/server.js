@@ -18,6 +18,7 @@ const { errorHandler } = require('./middleware/errorHandler');
 const requestRoutes = require('./routes/requests');
 const voteRoutes = require('./routes/votes');
 const userRoutes = require('./routes/users');
+const rideRoutes = require('./routes/rides');
 
 class RideShareServer {
   constructor() {
@@ -92,7 +93,8 @@ class RideShareServer {
           `${this.apiBasePath}/health`,
           `${this.apiBasePath}/requests`,
           `${this.apiBasePath}/votes`,
-          `${this.apiBasePath}/users`
+          `${this.apiBasePath}/users`,
+          `${this.apiBasePath}/rides`
         ]
       });
     });
@@ -111,6 +113,7 @@ class RideShareServer {
     this.app.use(`${this.apiBasePath}/requests`, requestRoutes);
     this.app.use(`${this.apiBasePath}/votes`, voteRoutes);
     this.app.use(`${this.apiBasePath}/users`, userRoutes);
+    this.app.use(`${this.apiBasePath}/rides`, rideRoutes);
 
     // Development-only admin routes
     if (process.env.NODE_ENV === 'development') {

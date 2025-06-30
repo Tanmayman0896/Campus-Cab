@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { requireAuth } = require('../middleware/auth');
-const { validateRideRequest, validateRideUpdate } = require('../middleware/validation');
+const { authenticateUser } = require('../middleware/auth');
 
 // GET /api/v1/rides - Get all rides
 router.get('/', async (req, res) => {
@@ -41,7 +40,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/v1/rides - Create new ride
-router.post('/', requireAuth, validateRideRequest, async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     // TODO: Implement create ride logic
     res.status(201).json({
@@ -59,7 +58,7 @@ router.post('/', requireAuth, validateRideRequest, async (req, res) => {
 });
 
 // PUT /api/v1/rides/:id - Update ride
-router.put('/:id', requireAuth, validateRideUpdate, async (req, res) => {
+router.put('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     // TODO: Implement update ride logic
@@ -78,7 +77,7 @@ router.put('/:id', requireAuth, validateRideUpdate, async (req, res) => {
 });
 
 // DELETE /api/v1/rides/:id - Delete ride
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params;
     // TODO: Implement delete ride logic
