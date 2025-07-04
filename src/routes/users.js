@@ -1,40 +1,48 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const { authenticateUser } = require('../middleware/auth');
-const { handleValidationErrors } = require('../middleware/errorHandler');
-const { updateUserValidation, userFilterValidation } = require('../middleware/validation');
+const userCtrl = require('../controllers/userController');
+const { auth } = require('../middleware/auth');
+const { handleErrors } = require('../middleware/errorHandler');
+const { validateUser, validateFilter } = require('../middleware/validation');
 
-// All routes require authentication
-router.use(authenticateUser);
+/**
+ * User Routes - Manage your profile and account
+ * 
+ * What you can do:
+ * - View and update your profile
+ * - See your ride statistics
+ * - Delete your account
+ */
 
-// Get user profile
-router.get('/profile', userController.getProfile);
+// Everyone needs to be logged in
+router.use(auth);
 
-// Update user profile
+/**
+ * GET /users/profile - View your profile
+ * See your account details
+ */
+router.get('/profile', userCtrl.getProfile);
+
+/**
+ * PUT /users/profile - Update your profile
+ * Change your name, phone, course, etc.
+ */
 router.put('/profile',
-  updateUserValidation,
-  handleValidationErrors,
-  userController.updateProfile
+  validateUser,
+  handleErrors,
+  userCtrl.updateProfile
 );
 
-// Get user statistics
-router.get('/stats', userController.getUserStats);
+/**
+ * DELETE /users/account - Delete your account
+ * Permanently remove your account and data
+ */
+router.delete('/account', userCtrl.deleteUser);
 
-// Filter users (with year, course, gender filters)
-router.get('/filter',
-  userFilterValidation,
-  handleValidationErrors,
-  userController.filterUsers
-);
-
-// Get user statistics by demographics
-router.get('/statistics', userController.getUserStatistics);
-
-// Get incomplete user profiles
-router.get('/incomplete-profiles', userController.getIncompleteProfiles);
-
-// Delete user account
-router.delete('/account', userController.deleteAccount);
+/**
+ * GET /users/stats - Your ride statistics
+ * See how many rides you've posted and joined
+ */
+router.get('/stats', userCtrl.getUserStats);
 
 module.exports = router;

@@ -1,14 +1,26 @@
 const prisma = require('../config/database');
 
+/**
+ * VoteController - Handle voting on ride requests
+ * 
+ * Features:
+ * - Vote on rides (accept/reject with optional note FROM voter TO request owner)
+ * - View votes on your requests (with notes from voters)
+ * - Manage your own votes
+ */
 class VoteController {
-  // Vote on a request
-  async voteOnRequest(req, res, next) {
+  
+  /**
+   * Vote on a ride request
+   * Voter sends optional message TO the request owner when voting
+   */
+  async vote(req, res, next) {
     try {
       const { requestId } = req.params;
-      const { status } = req.body; // 'accepted' or 'rejected'
+      const { status, note } = req.body; // 'accepted' or 'rejected' and optional note FROM voter TO request owner
       const userId = req.user.id;
 
-      // Check if request exists and is active
+      // Find request and check if it exists and is active
       const request = await prisma.request.findUnique({
         where: { id: requestId },
         include: {
@@ -69,7 +81,10 @@ class VoteController {
         // Update existing vote
         vote = await prisma.vote.update({
           where: { id: existingVote.id },
-          data: { status },
+          data: { 
+            status,
+            note: note || null // Update note or set to null if not provided
+          },
           include: {
             user: {
               select: {
@@ -110,7 +125,8 @@ class VoteController {
           data: {
             requestId,
             userId,
-            status
+            status,
+            note: note || null // Include note if provided
           },
           include: {
             user: {
@@ -174,7 +190,7 @@ class VoteController {
     }
   }
 
-  // Get votes for user's requests
+  // Get votes for user's requests (request owner can see notes from voters)
   async getRequestVotes(req, res, next) {
     try {
       const { requestId } = req.params;
@@ -216,7 +232,7 @@ class VoteController {
     }
   }
 
-  // Get user's votes
+  // Get user's votes (voter can see their own votes and notes)
   async getUserVotes(req, res, next) {
     try {
       const userId = req.user.id;

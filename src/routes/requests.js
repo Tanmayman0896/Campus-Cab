@@ -1,44 +1,59 @@
 const express = require('express');
 const router = express.Router();
-const requestController = require('../controllers/requestController');
-const { authenticateUser } = require('../middleware/auth');
-const { handleValidationErrors } = require('../middleware/errorHandler');
-const { createRequestValidation, searchRequestsValidation } = require('../middleware/validation');
+const reqCtrl = require('../controllers/requestController');
+const { auth } = require('../middleware/auth');
+const { handleErrors } = require('../middleware/errorHandler');
+const { validateReq, validateSearch } = require('../middleware/validation');
 
-// All routes require authentication
-router.use(authenticateUser);
+/**
+ * Ride Request Routes
+ * 
+ * What you can do:
+ * - Post a ride request
+ * - Find rides going your way
+ * - Manage your own requests
+ * - View request details and who wants to join
+ */
 
-// Create new request
+// Everyone needs to be logged in
+router.use(auth);
 router.post('/', 
-  createRequestValidation,
-  handleValidationErrors,
-  requestController.createRequest
+  validateReq,
+  handleErrors,
+  reqCtrl.createRequest
 );
-
-// Search requests
-router.get('/search',
-  searchRequestsValidation,
-  handleValidationErrors,
-  requestController.searchRequests
-);
-
-// Get all requests (common request page)
-router.get('/all', requestController.getAllRequests);
-
-// Get user's own requests
-router.get('/my-requests', requestController.getUserRequests);
-
-// Get single request by ID
-router.get('/:id', requestController.getRequestById);
-
-// Update user's own request
 router.put('/:id',
-  createRequestValidation,
-  handleValidationErrors,
-  requestController.updateRequest
+  validateReq,
+  handleErrors,
+  reqCtrl.updateRequest
+);
+router.delete('/:id', reqCtrl.deleteRequest);
+/**
+ * GET /requests/search - Find rides
+ * Look for rides that match your route and time
+ */
+router.get('/search',
+  validateSearch,
+  handleErrors,
+  reqCtrl.searchRequests
 );
 
-// Delete/cancel user's own request
-router.delete('/:id', requestController.deleteRequest);
+/**
+ * GET /requests/all - Browse all rides
+ * See all available ride requests
+ */
+router.get('/all', reqCtrl.getAllRequests);
+
+/**
+ * GET /requests/my-requests - Your requests
+ * See all your posted ride requests
+ */
+router.get('/my-requests', reqCtrl.getUserRequests);
+
+/**
+ * GET /requests/:id - View request details
+ * See full details and who wants to join
+ */
+router.get('/:id', reqCtrl.getRequestById);
 
 module.exports = router;

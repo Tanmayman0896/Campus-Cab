@@ -1,27 +1,48 @@
 const express = require('express');
 const router = express.Router();
-const voteController = require('../controllers/voteController');
-const { authenticateUser } = require('../middleware/auth');
-const { handleValidationErrors } = require('../middleware/errorHandler');
-const { voteValidation } = require('../middleware/validation');
+const voteCtrl = require('../controllers/voteController');
+const { auth } = require('../middleware/auth');
+const { handleErrors } = require('../middleware/errorHandler');
+const { validateVote } = require('../middleware/validation');
 
-// All routes require authentication
-router.use(authenticateUser);
+/**
+ * Vote Routes - Join rides or decline requests
+ * 
+ * What you can do:
+ * - Vote to join someone's ride (with optional message)
+ * - See who wants to join your rides
+ * - Manage your votes
+ */
 
-// Vote on a request
+// Everyone needs to be logged in
+router.use(auth);
+/**
+ * POST /votes/:requestId - Vote on a ride
+ * Say yes or no to joining someone's ride
+ * You can add a message like "I'll be at the main gate!"
+ */
 router.post('/:requestId',
-  voteValidation,
-  handleValidationErrors,
-  voteController.voteOnRequest
+  validateVote,
+  handleErrors,
+  voteCtrl.vote
 );
 
-// Get votes for a specific request (request owner only)
-router.get('/request/:requestId', voteController.getRequestVotes);
+/**
+ * DELETE /votes/:requestId - Remove your vote
+ * Change your mind about a ride
+ */
+router.delete('/:requestId', voteCtrl.deleteVote);
 
-// Get user's own votes
-router.get('/my-votes', voteController.getUserVotes);
+/**
+ * GET /votes/request/:requestId - See who wants to join your ride
+ * View all votes on your ride request (with their messages)
+ */
+router.get('/request/:requestId', voteCtrl.getRequestVotes);
 
-// Delete user's vote
-router.delete('/:requestId', voteController.deleteVote);
+/**
+ * GET /votes/my-votes - Your votes
+ * See all rides you've voted on
+ */
+router.get('/my-votes', voteCtrl.getUserVotes);
 
 module.exports = router;

@@ -5,6 +5,7 @@ const moment = require('moment');
 class CleanupService {
   constructor() {
     this.isRunning = false;
+    this.cronJob = null; // Store the cron job reference
   }
 
   // Start the cleanup service
@@ -17,7 +18,7 @@ class CleanupService {
     const intervalHours = process.env.AUTO_CLEANUP_INTERVAL_HOURS || 1;
     
     // Run cleanup every hour
-    cron.schedule(`0 */${intervalHours} * * *`, async () => {
+    this.cronJob = cron.schedule(`0 */${intervalHours} * * *`, async () => {
       console.log('Running automatic cleanup...');
       await this.cleanupExpiredRequests();
     });
@@ -28,7 +29,10 @@ class CleanupService {
 
   // Stop the cleanup service
   stop() {
-    cron.destroy();
+    if (this.cronJob) {
+      this.cronJob.stop();
+      this.cronJob = null;
+    }
     this.isRunning = false;
     console.log('Cleanup service stopped');
   }

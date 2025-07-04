@@ -1,22 +1,18 @@
 const { PrismaClient } = require('@prisma/client');
-require('dotenv').config(); // Load .env variables
+require('dotenv').config();
 
 const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-  log: ['query', 'info', 'warn', 'error'], // Enable query logging for debugging
+  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+  errorFormat: 'pretty',
 });
 
-// Optional: Test database connection on startup
+// Test database connection
 async function connectDB() {
   try {
     await prisma.$connect();
-    console.log('Connected to PostgreSQL database');
+    console.log('✅ Connected to PostgreSQL database');
   } catch (error) {
-    console.error('Failed to connect to database:', error);
+    console.error('❌ Failed to connect to database:', error);
     process.exit(1);
   }
 }

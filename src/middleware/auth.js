@@ -1,23 +1,21 @@
 const { admin } = require('../config/firebase');
-const prisma = require('../config/database');
-
-const authenticateUser = async (req, res, next) => {
+const db = require('../config/database');
+const auth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: 'Authorization token required'
+        message: 'Please log in first'
       });
     }
 
     const token = authHeader.substring(7);
     
-    // Check if Firebase Admin is configured
+    // If Firebase Admin isn't set up, use mock user for development
     if (!admin) {
-      // For development without Firebase Admin, create a mock user
-      console.log('Warning: Using mock authentication - Firebase Admin not configured');
+      console.log('Warning: Using mock user - Firebase Admin not configured');
       req.user = {
         id: 'dev-user-123',
         firebaseUid: 'dev-firebase-uid',
@@ -32,14 +30,14 @@ const authenticateUser = async (req, res, next) => {
     // Verify Firebase token
     const decodedToken = await admin.auth().verifyIdToken(token);
     
-    // Get user from database
-    let user = await prisma.user.findUnique({
+    // Find user in database
+    let user = await db.user.findUnique({
       where: { firebaseUid: decodedToken.uid }
     });
 
-    // Create user if doesn't exist
+    // Create user if they don't exist
     if (!user) {
-      user = await prisma.user.create({
+      user = await db.user.create({
         data: {
           firebaseUid: decodedToken.uid,
           email: decodedToken.email,
@@ -52,12 +50,12 @@ const authenticateUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
+    console.error('Auth error:', error);
     return res.status(401).json({
       success: false,
-      message: 'Invalid or expired token'
+      message: 'Invalid login token'
     });
   }
 };
 
-module.exports = { authenticateUser };
+module.exports = { auth };

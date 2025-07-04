@@ -188,22 +188,60 @@ class RideShareServer {
       // Start cleanup service
       cleanupService.start();
       
-      // Start the server
-      this.server = this.app.listen(this.port, () => {
-        console.log(`Rideshare server running on port ${this.port}`);
-        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`API Base URL: http://localhost:${this.port}${this.apiBasePath}`);
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`Developer tools:`);
-          console.log(`GET /admin/cleanup - Run manual cleanup`);
-          console.log(`GET /admin/stats - View system statistics`);
-        }
-      });
+      // Start the server with port fallback
+      await this.startWithPortFallback();
       
     } catch (error) {
       console.error('Failed to start server:', error);
       process.exit(1);
+    }
+  }
+
+  // Start server with port fallback
+  async startWithPortFallback() {
+    const maxAttempts = 10;
+    let currentPort = this.port;
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await new Promise((resolve, reject) => {
+          const server = this.app.listen(currentPort, () => {
+            this.server = server;
+            this.port = currentPort;
+            console.log(`✅ Rideshare server running on port ${currentPort}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`API Base URL: http://localhost:${currentPort}${this.apiBasePath}`);
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`Developer tools:`);
+              console.log(`GET /admin/cleanup - Run manual cleanup`);
+              console.log(`GET /admin/stats - View system statistics`);
+            }
+            resolve();
+          });
+          
+          server.on('error', (err) => {
+            if (err.code === 'EADDRINUSE') {
+              console.log(`⚠️  Port ${currentPort} is busy, trying port ${currentPort + 1}...`);
+              server.close();
+              reject(err);
+            } else {
+              reject(err);
+            }
+          });
+        });
+        
+        // If we reach here, server started successfully
+        break;
+        
+      } catch (error) {
+        if (error.code === 'EADDRINUSE' && attempt < maxAttempts) {
+          currentPort++;
+          continue;
+        } else {
+          throw error;
+        }
+      }
     }
   }
 
