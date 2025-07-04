@@ -4,45 +4,28 @@ const userCtrl = require('../controllers/userController');
 const { auth } = require('../middleware/auth');
 const { handleErrors } = require('../middleware/errorHandler');
 const { validateUser, validateFilter } = require('../middleware/validation');
-
-/**
- * User Routes - Manage your profile and account
- * 
- * What you can do:
- * - View and update your profile
- * - See your ride statistics
- * - Delete your account
- */
-
-// Everyone needs to be logged in
 router.use(auth);
 
-/**
- * GET /users/profile - View your profile
- * See your account details
- */
+ //GET /users/profile - View your profile
+ 
 router.get('/profile', userCtrl.getProfile);
 
-/**
- * PUT /users/profile - Update your profile
- * Change your name, phone, course, etc.
- */
+
+ //PUT /users/profile - Update your profile
+
 router.put('/profile',
   validateUser,
   handleErrors,
   userCtrl.updateProfile
 );
 
-/**
- * DELETE /users/account - Delete your account
- * Permanently remove your account and data
- */
+
+ //DELETE /users/account - Delete your account
+ 
 router.delete('/account', userCtrl.deleteUser);
 
-/**
- * GET /users/stats - Your ride statistics
- * See how many rides you've posted and joined
- */
+ // GET /users/stats - Your ride statistics
+
 router.get('/stats', userCtrl.getUserStats);
 
 module.exports = router;

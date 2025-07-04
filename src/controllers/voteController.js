@@ -1,19 +1,5 @@
 const prisma = require('../config/database');
-
-/**
- * VoteController - Handle voting on ride requests
- * 
- * Features:
- * - Vote on rides (accept/reject with optional note FROM voter TO request owner)
- * - View votes on your requests (with notes from voters)
- * - Manage your own votes
- */
 class VoteController {
-  
-  /**
-   * Vote on a ride request
-   * Voter sends optional message TO the request owner when voting
-   */
   async vote(req, res, next) {
     try {
       const { requestId } = req.params;

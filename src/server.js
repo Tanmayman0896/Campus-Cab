@@ -1,5 +1,3 @@
-// File: src/server.js
-
 // Load environment variables first thing
 require('dotenv').config();
 
@@ -208,7 +206,7 @@ class RideShareServer {
           const server = this.app.listen(currentPort, () => {
             this.server = server;
             this.port = currentPort;
-            console.log(`✅ Rideshare server running on port ${currentPort}`);
+            console.log(`Rideshare server running on port ${currentPort}`);
             console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(`API Base URL: http://localhost:${currentPort}${this.apiBasePath}`);
             
@@ -222,7 +220,7 @@ class RideShareServer {
           
           server.on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-              console.log(`⚠️  Port ${currentPort} is busy, trying port ${currentPort + 1}...`);
+              console.log(`Port ${currentPort} is busy, trying port ${currentPort + 1}...`);
               server.close();
               reject(err);
             } else {

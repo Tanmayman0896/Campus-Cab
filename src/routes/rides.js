@@ -5,10 +5,9 @@ const { auth } = require('../middleware/auth');
 // Everyone needs to be logged in
 router.use(auth);
 
-/**
- * GET /rides - See all available rides
- * Browse rides offered by others
- */
+
+  //GET /rides - See all available rides
+ 
 router.get('/', async (req, res) => {
   try {
     res.json({
@@ -25,10 +24,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * GET /rides/:id - View ride details
- * See full details of a specific ride
- */
+//GET /rides/:id - View ride details
+ 
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -46,10 +43,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-/**
- * POST /rides - Offer a ride
- * Post a ride you're offering to others
- */
+
+ // POST /rides - Offer a ride
+ 
 router.post('/', auth, async (req, res) => {
   try {
     res.status(201).json({
@@ -66,10 +62,9 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-/**
- * PUT /rides/:id - Update your ride
- * Change details of your ride offer
- */
+
+ // PUT /rides/:id - Update your ride
+ 
 router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,10 +82,9 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-/**
- * DELETE /rides/:id - Cancel your ride
- * Remove your ride offer
- */
+
+ // DELETE /rides/:id - Cancel your ride
+ 
 router.delete('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
