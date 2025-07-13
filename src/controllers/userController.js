@@ -10,7 +10,6 @@ class UserController {
         where: { id: currentUserId },
         select: {
           id: true,
-          firebaseUid: true,
           email: true,
           name: true,
           phone: true,
@@ -64,7 +63,6 @@ class UserController {
         },
         select: {
           id: true,
-          firebaseUid: true,
           email: true,
           name: true,
           phone: true,
@@ -172,7 +170,6 @@ class UserController {
           take: parseInt(limit),
           select: {
             id: true,
-            firebaseUid: true,
             email: true,
             name: true,
             phone: true,

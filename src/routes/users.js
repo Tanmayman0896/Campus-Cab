@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const userCtrl = require('../controllers/userController');
-const { auth } = require('../middleware/auth');
-const { handleErrors } = require('../middleware/errorHandler');
-const { validateUser, validateFilter } = require('../middleware/validation');
-router.use(auth);
+
+// No middleware - direct access
 
  //GET /users/profile - View your profile
  
@@ -13,11 +11,7 @@ router.get('/profile', userCtrl.getProfile);
 
  //PUT /users/profile - Update your profile
 
-router.put('/profile',
-  validateUser,
-  handleErrors,
-  userCtrl.updateProfile
-);
+router.put('/profile', userCtrl.updateProfile);
 
 
  //DELETE /users/account - Delete your account

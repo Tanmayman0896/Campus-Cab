@@ -1,20 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const voteCtrl = require('../controllers/voteController');
-const { auth } = require('../middleware/auth');
-const { handleErrors } = require('../middleware/errorHandler');
-const { validateVote } = require('../middleware/validation');
-// Everyone needs to be logged in
-router.use(auth);
+
+// No middleware - direct access
 //POST /votes/:requestId - Vote on a ride
 
-router.post('/:requestId',
-  validateVote,
-  handleErrors,
-  voteCtrl.vote
-);
-
-
+router.post('/:requestId', voteCtrl.vote);
  // DELETE /votes/:requestId - Remove your vote
  
 router.delete('/:requestId', voteCtrl.deleteVote);

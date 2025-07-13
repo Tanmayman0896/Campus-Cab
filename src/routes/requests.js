@@ -1,31 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const reqCtrl = require('../controllers/requestController');
-const { auth } = require('../middleware/auth');
-const { handleErrors } = require('../middleware/errorHandler');
-const { validateReq, validateSearch } = require('../middleware/validation');
 
-// Everyone needs to be logged in
-router.use(auth);
-router.post('/', 
-  validateReq,
-  handleErrors,
-  reqCtrl.createRequest
-);
-router.put('/:id',
-  validateReq,
-  handleErrors,
-  reqCtrl.updateRequest
-);
+// No middleware - direct access
+router.post('/', reqCtrl.createRequest);
+router.put('/:id', reqCtrl.updateRequest);
 router.delete('/:id', reqCtrl.deleteRequest);
 /**
  * GET /requests/search - Find rides
  */
-router.get('/search',
-  validateSearch,
-  handleErrors,
-  reqCtrl.searchRequests
-);
+router.get('/search', reqCtrl.searchRequests);
 
 /**
  * GET /requests/all - Browse all rides

@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
 
-// Everyone needs to be logged in
-router.use(auth);
+// No authentication required - all routes are public
 
 
   //GET /rides - See all available rides
@@ -46,7 +44,7 @@ router.get('/:id', async (req, res) => {
 
  // POST /rides - Offer a ride
  
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     res.status(201).json({
       success: true,
@@ -65,7 +63,7 @@ router.post('/', auth, async (req, res) => {
 
  // PUT /rides/:id - Update your ride
  
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     res.json({
@@ -85,7 +83,7 @@ router.put('/:id', auth, async (req, res) => {
 
  // DELETE /rides/:id - Cancel your ride
  
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     res.json({
